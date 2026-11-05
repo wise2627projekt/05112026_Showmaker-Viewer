@@ -1,0 +1,14 @@
+# Fallback for newer Python versions (3.12/3.13) where the exact pins have no wheels.
+numpy>=1.26
+scipy>=1.11
+scikit-image>=0.22
+opencv-python>=4.9
+Pillow>=10.2
+pillow-heif>=0.15
+reportlab>=4.1
+ezdxf>=1.1
+PyYAML>=6.0
+PySide6>=6.6
+imageio-ffmpeg>=0.4.9
+svgelements>=1.9.6
+psutil

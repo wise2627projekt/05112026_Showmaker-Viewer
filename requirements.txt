@@ -1,0 +1,14 @@
+# Stage 1 (core). Torch / ONNX / PySide6 pins are added in stages 2-4.
+numpy==1.26.4
+scipy==1.11.4
+scikit-image==0.22.0
+opencv-python==4.9.0.80
+Pillow==10.2.0
+pillow-heif==0.15.0
+reportlab==4.1.0
+ezdxf==1.1.4
+PyYAML==6.0.1
+PySide6==6.6.2
+imageio-ffmpeg==0.4.9
+svgelements==1.9.6
+psutil>=5.9
