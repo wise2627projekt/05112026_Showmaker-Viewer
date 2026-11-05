@@ -1,0 +1,53 @@
+# Builds the Show Maker and the Viewer (Windows) on GitHub's own machines - nothing to install on your computer.
+# Run it:  the "Actions" tab of this repository -> "Build Show Maker and Viewer" -> "Run workflow".
+# After about 10-15 minutes the finished zip is at the bottom of the run page ("Artifacts").
+name: Build Show Maker and Viewer
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install libraries
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt || python -m pip install -r requirements-flex.txt
+          python -m pip install pyinstaller
+
+      - name: Build the programs
+        shell: bash
+        run: python -m PyInstaller --noconfirm --clean PhotoVecShow.spec
+
+      - name: Test the FINISHED programs
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          Start-Process -FilePath "dist\PhotoVecShow\PhotoVecShowMaker.exe" -ArgumentList "--selftest","selftest_maker.txt" -Wait -NoNewWindow
+          Get-Content selftest_maker.txt
+          if (-not (Select-String -Path selftest_maker.txt -Pattern "SELFTEST OK" -Quiet)) { exit 1 }
+          Start-Process -FilePath "dist\PhotoVecShow\PhotoVecViewer.exe" -ArgumentList "--selftest","selftest_viewer.txt" -Wait -NoNewWindow
+          Get-Content selftest_viewer.txt
+          if (-not (Select-String -Path selftest_viewer.txt -Pattern "SELFTEST OK" -Quiet)) { exit 1 }
+
+      - name: Pack
+        shell: pwsh
+        run: Compress-Archive -Path dist\PhotoVecShow -DestinationPath PhotoVec-ShowMaker-Viewer-Windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhotoVec-ShowMaker-Viewer-Windows
+          path: PhotoVec-ShowMaker-Viewer-Windows.zip
+          if-no-files-found: error
